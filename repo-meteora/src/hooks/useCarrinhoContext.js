@@ -1,8 +1,16 @@
-import { useContext } from "react"
-import { CarrinhoContext } from "../context/CarrinhoContext"
+import { useContext } from "react";
+import { CarrinhoContext } from "@/context/CarrinhoContext";
 
 export const useCarrinhoContext = () => {
   const { carrinho, setCarrinho } = useContext(CarrinhoContext);
+
+  function mudarQuantidade(id, quantidade) {
+    return carrinho.map((itemCarrinho) => {
+      if (itemCarrinho.id === id) { itemCarrinho.quantidade += quantidade; }
+      return itemCarrinho;
+    })
+  }
+
   function adicionarProduto(novoProduto) {
     const temProduto = carrinho.some((itemCarrinho) => itemCarrinho.id === novoProduto.id);
     if (!temProduto) {
@@ -12,13 +20,8 @@ export const useCarrinhoContext = () => {
         novoProduto,
       ]);
     }
-    setCarrinho((carrinhoAnterior) =>
-      carrinhoAnterior.map((itemCarrinho) => {
-        if (carrinhoAnterior.id === novoProduto.id)
-          itemCarrinho.quantidade += 1;
-        return itemCarrinho;
-      })
-    );
+    const carrinhoAtualizado = mudarQuantidade(novoProduto.id, 1);
+    setCarrinho([...carrinhoAtualizado]);
   }
   function removerProduto(id) {
     const produto = carrinho.find((itemDoCarrinho) => itemDoCarrinho.id === id);
@@ -28,12 +31,8 @@ export const useCarrinhoContext = () => {
         carrinhoAnterior.filter((itemDoCarrinho) => itemDoCarrinho.id !== id)
       );
     }
-    setCarrinho((carrinhoAnterior) =>
-      carrinhoAnterior.map((itemDoCarrinho) => {
-        if (itemDoCarrinho.id === id) itemDoCarrinho.quantidade -= 1;
-        return itemDoCarrinho;
-      })
-    );
+    const carrinhoAtualizado = mudarQuantidade(id, -1);
+    setCarrinho([...carrinhoAtualizado]);
   }
 
   return {
